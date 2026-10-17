@@ -1,5 +1,5 @@
 plugins {
-    id "net.neoforged.moddev" version "2.0.77"
+    id "net.neoforged.moddev" version "2.0.148"
 }
 
 version = mod_version
@@ -17,12 +17,8 @@ processResources {
 }
 
 neoForge {
+    // Game is unobfuscated as of 26.x, so no parchment / mappings config is needed.
     version = project.neo_version
-
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.minecraft_version
-    }
 
     runs {
         client {

@@ -1,5 +1,5 @@
 plugins {
-    id "fabric-loom" version "1.7-SNAPSHOT" apply false
+    id "net.fabricmc.fabric-loom" version "1.18-SNAPSHOT" apply false
     id "org.spongepowered.gradle.vanilla" version "0.2.1-SNAPSHOT" apply false
     id "org.spongepowered.mixin" version "0.7-SNAPSHOT" apply false
 }
@@ -10,12 +10,12 @@ subprojects {
     apply plugin: "idea"
     apply plugin: 'maven-publish'
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+    java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
     repositories {
         mavenCentral()
         maven { url "https://www.cursemaven.com" }
-        maven { url "file://${rootDir}/publishing" }
+        maven { url = rootProject.file("publishing") }
         maven { url = "https://api.modrinth.com/maven" }
         maven { url "https://maven.bai.lol" }
         maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
@@ -44,13 +44,13 @@ subprojects {
         }
         repositories {
             maven {
-                url "file://${rootDir}/publishing"
+                url = rootProject.file("publishing")
             }
         }
     }
 
     tasks.withType(JavaCompile).configureEach {
         it.options.encoding = "UTF-8"
-        it.options.release = 21
+        it.options.release = 25
     }
 }
