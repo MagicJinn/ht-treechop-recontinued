@@ -12,7 +12,7 @@ Send me a log! See [how to find and share Minecraft logs](https://github.com/ham
 
 ## Want to make your mod compatible with TreeChop?
 
-See the wiki - https://github.com/hammertater/treechop/wiki/Adding-compatibility-with-TreeChop
+See the wiki - <https://github.com/hammertater/treechop/wiki/Adding-compatibility-with-TreeChop>
 
 ## Configuring chop counting (version 0.13.0 and later)
 <!-- For generating equation svgs: https://www.codecogs.com/latex/eqneditor.php-->
@@ -34,7 +34,6 @@ where `chopsPerBlock` and `baseNumChops` are configurable and the actual number 
 
 If `chopsPerBlock > 1` or `baseNumChops > 0`, then you should consider the setting for `canRequireMoreChopsThanBlocks`, which determines whether the number of chops required to fell a tree can exceed the number of blocks in the tree. For example, setting `baseNumChops = 8`, `chopsPerBlock = 0`, and `canRequireMoreChopsThanBlocks = true` would mean that all trees fall after exactly 8 chops (the number of chops needed to whittle a single log block down to nothing).
 
-
 ### Logarithmic
 
 `algorithm = "LOGARITHMIC"`
@@ -46,7 +45,7 @@ The logarithmic algorithm follows the function
 
 where the parameter `a` is configurable and controls the steepness of the curve as the tree size (*#blocks*) increases.
 
-The figure and tables below show how `a` affects the number of chops required for different tree sizes. The default value `a = 10` results in the gray curve. At the extremes, if `a = 0`, then any size tree will only require one chop, and if `a = ∞`, then felling a tree will require the same amount of chops as there are blocks (the red curve).   
+The figure and tables below show how `a` affects the number of chops required for different tree sizes. The default value `a = 10` results in the gray curve. At the extremes, if `a = 0`, then any size tree will only require one chop, and if `a = ∞`, then felling a tree will require the same amount of chops as there are blocks (the red curve).
 
 ![log curves](docs/log_curves.svg)
 
@@ -73,7 +72,6 @@ The actual number of chops required depends on the rounding method (`chopCountRo
 | Required chops (a = ∞)  |   1 |   2 |   3 |   5 |   8 |   10 |   20 |   50 |   100 |   200 |   1000 |
 
 ##### Rounding: `UP`
-
 
 | Number of blocks        |   1 |   2 |   3 |   5 |   8 |   10 |   20 |   50 |   100 |   200 |   1000 |
 |:------------------------|----:|----:|----:|----:|----:|-----:|-----:|-----:|------:|------:|-------:|
