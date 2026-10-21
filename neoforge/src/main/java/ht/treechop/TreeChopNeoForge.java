@@ -13,9 +13,8 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
-import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.NeoForgeConfig;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
@@ -29,7 +28,7 @@ public class TreeChopNeoForge extends TreeChop {
         platform = new NeoForgePlatform();
         api = new TreeChopNeoForgeAPI(TreeChop.MOD_ID);
 
-        container.registerConfig(ModConfig.Type.COMMON, ConfigHandler.COMMON_SPEC);
+        container.registerConfig(ModConfig.Type.LOCAL, ConfigHandler.COMMON_SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, ConfigHandler.CLIENT_SPEC);
 
         NeoForgeRegistry.Blocks.REGISTRY.register(modBus);
@@ -42,9 +41,8 @@ public class TreeChopNeoForge extends TreeChop {
 
         NeoForge.EVENT_BUS.addListener((TagsUpdatedEvent event) -> ConfigHandler.updateTags());
 
-        if (FMLLoader.getDist() == Dist.CLIENT) {
+        if (FMLEnvironment.getDist() == Dist.CLIENT)
             NeoForgeClientProxy.init(modBus);
-        }
 
         // TODO: register commands (see fabric)
     }

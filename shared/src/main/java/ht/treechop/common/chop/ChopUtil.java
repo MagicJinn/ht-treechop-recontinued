@@ -17,7 +17,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -257,19 +256,28 @@ public class ChopUtil {
         } else {
             final float volume = .3f;
             final float pitch = 1f;
-            level.playSound(thwacker, pos, TreeChop.CHOP_WOOD_EVENT.get(), SoundSource.BLOCKS, volume, pitch);
+            // Client: playLocalSound always hears. Server: playSound(except thwacker) for
+            // others.
+            if (level.isClientSide()) {
+                level.playLocalSound(pos, TreeChop.CHOP_WOOD_EVENT.get(), SoundSource.BLOCKS, volume, pitch, false);
+            } else {
+                level.playSound(thwacker, pos, TreeChop.CHOP_WOOD_EVENT.get(), SoundSource.BLOCKS, volume, pitch);
+            }
             level.addDestroyBlockEffect(pos, state);
         }
     }
 
-    public static BlockState getStrippedState(BlockAndTintGetter level, BlockPos pos, BlockState state) {
+    public static BlockState getStrippedState(BlockGetter level, BlockPos pos, BlockState state) {
         return getStrippedState(level, pos, state, state);
     }
 
     /**
      * Only use for visual purposes, does not affect gameplay
      */
-    public static BlockState getStrippedState(BlockAndTintGetter level, BlockPos pos, BlockState state, BlockState fallback) {
+    public static BlockState getStrippedState(BlockGetter level, BlockPos pos, BlockState state, BlockState fallback) {
+        if (level instanceof Level realLevel)
+            AxeAccessor.warmFrom(realLevel);
+
         BlockState strippedState = (AxeAccessor.isStripped(state.getBlock())) ? state : AxeAccessor.getStripped(state);
         if (strippedState == null) {
             strippedState = TreeChop.platform.getStrippedState(level, pos, state);

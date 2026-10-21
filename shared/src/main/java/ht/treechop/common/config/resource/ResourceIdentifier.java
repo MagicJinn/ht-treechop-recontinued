@@ -108,7 +108,7 @@ public abstract class ResourceIdentifier {
         return string;
     }
 
-    public String getResourceLocation() {
+    public String getIdentifier() {
         return String.format("%s:%s", getNamespace(), getLocalSpace());
     }
 

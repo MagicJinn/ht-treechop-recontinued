@@ -80,8 +80,8 @@ dependencies {
 //    localRuntime "mcp.mobius.waila:wthit:neo-12.5.1"
 //    localRuntime "lol.bai:badpackets:neo-0.8.1"
 
-    compileOnly "curse.maven:jade-324717:5591256"
-    localRuntime "curse.maven:jade-324717:5591256"
+    compileOnly "maven.modrinth:jade:${project.jade_version_neoforge}"
+    localRuntime "maven.modrinth:jade:${project.jade_version_neoforge}"
 
     compileOnly "curse.maven:the-one-probe-245211:5502323"
 //    localRuntime "curse.maven:the-one-probe-245211:5502323"
@@ -136,6 +136,16 @@ dependencies {
 //    localRuntime "curse.maven:alexs-caves-924854:4952948"
 
 //    localRuntime "curse.maven:the-twilight-forest-227639:4865711"
+}
+
+sourceSets.main.java {
+    // Outdated third-party APIs still target ResourceLocation / pre-26.3 APIs.
+    exclude 'ht/treechop/compat/TheOneProbe.java'
+    exclude 'ht/treechop/compat/TheOneProbeInfoProvider.java'
+    exclude 'ht/treechop/compat/ProjectMMO.java'
+    exclude 'ht/treechop/compat/SilentGear.java'
+    exclude 'ht/treechop/compat/Wthit.java'
+    exclude 'ht/treechop/compat/mixin/MultiMineMixin.java'
 }
 
 sourceSets.main.resources {

@@ -8,7 +8,7 @@ import ht.treechop.api.ChopEvent;
 import ht.treechop.common.block.ChoppedLogBlock;
 import ht.treechop.common.block.ChoppedLogBlock.MyEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-@EventBusSubscriber(modid = TreeChop.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = TreeChop.MOD_ID)
 public class ProjectMMO {
 
     private static boolean broke = false;
@@ -75,7 +75,7 @@ public class ProjectMMO {
     private static final Function<BlockEntity, Map<String, Long>> TREE_XP = (blockEntityIn) -> {
         try {
             if (blockEntityIn instanceof MyEntity choppedLog && choppedLog.getLevel() != null) {
-                ResourceLocation resource = Optional
+                Identifier resource = Optional
                         .of(BuiltInRegistries.BLOCK.getKey(choppedLog.getOriginalState().getBlock()))
                         .orElse(BuiltInRegistries.BLOCK.getKey(Blocks.OAK_LOG));
 

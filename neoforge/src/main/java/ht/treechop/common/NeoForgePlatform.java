@@ -7,31 +7,24 @@ import ht.treechop.common.platform.ModLoader;
 import ht.treechop.common.platform.Platform;
 import ht.treechop.common.util.TreeDataImpl;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.NeoForge;
 
 public class NeoForgePlatform implements Platform {
 
     @Override
     public boolean isDedicatedServer() {
-        return FMLEnvironment.dist.isDedicatedServer();
+        return FMLEnvironment.getDist().isDedicatedServer();
     }
 
     @Override
@@ -111,25 +104,19 @@ public class NeoForgePlatform implements Platform {
     }
 
     @Override
-    public ResourceLocation getResourceLocationForBlock(Block block) {
+    public Identifier getIdentifierForBlock(Block block) {
         return BuiltInRegistries.BLOCK.getKey(block);
     }
 
     @Override
-    public ResourceLocation getResourceLocationForItem(Item item) {
+    public Identifier getIdentifierForItem(Item item) {
         return BuiltInRegistries.ITEM.getKey(item);
     }
 
     @Override
-    public BlockState getStrippedState(BlockAndTintGetter level, BlockPos pos, BlockState state) {
-        try {
-            if (level instanceof Level realLevel) {
-                BlockHitResult fakeHitResult = BlockHitResult.miss(Vec3.ZERO, Direction.DOWN, pos);
-                return state.getToolModifiedState(new UseOnContext(realLevel, null, InteractionHand.MAIN_HAND, ItemStack.EMPTY, fakeHitResult), ItemAbilities.AXE_STRIP, true);
-            }
-        } catch (NullPointerException e) {
-            // Do nothing
-        }
+    public BlockState getStrippedState(BlockGetter level, BlockPos pos, BlockState state) {
+        // ItemAbilities.AXE_STRIP was removed in 26.3. Stripping is handled by
+        // AxeAccessor via BlockTransformers.AXE.
         return null;
     }
 }

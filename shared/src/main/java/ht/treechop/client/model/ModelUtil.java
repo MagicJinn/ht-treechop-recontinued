@@ -1,72 +1,18 @@
 package ht.treechop.client.model;
 
 import ht.tuber.math.Vector3;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockElementFace;
-import net.minecraft.client.renderer.block.model.BlockFaceUV;
-import net.minecraft.client.renderer.block.model.FaceBakery;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.model.geom.builders.UVPair;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
-import java.util.Arrays;
-
+/**
+ * Quad trim/translate helpers for the 26.3 {@link BakedQuad} record
+ * (positions in 0–1 block space, UVs packed via {@link UVPair}).
+ */
 public class ModelUtil {
-    private static final ResourceLocation UNKNOWN_RESOURCE = ResourceLocation.fromNamespaceAndPath("treechop", "dynamic");
-
-    public static BakedQuad makeQuad(
-            TextureAtlasSprite sprite,
-            Vector3 posFrom,
-            Vector3 posTo,
-            Direction orientation,
-            Direction culling
-    ) {
-        return makeQuad(
-                sprite,
-                posFrom,
-                posTo,
-                orientation,
-                culling,
-                getUVsForQuad(posFrom, posTo, orientation),
-                0
-        );
-    }
-
-    private static float[] getUVsForQuad(Vector3 posFrom, Vector3 posTo, Direction orientation) {
-        Vector3f posFrom3f = toVector3f(posFrom);
-        Vector3f posTo3f = toVector3f(posTo);
-        return switch (orientation) {
-            case UP, DOWN -> new float[]{posFrom3f.x(), posFrom3f.z(), posTo3f.x(), posTo3f.z()};
-            case EAST, WEST -> new float[]{posFrom3f.z(), posFrom3f.y(), posTo3f.z(), posTo3f.y()};
-            case NORTH, SOUTH -> new float[]{posFrom3f.x(), posFrom3f.y(), posTo3f.x(), posTo3f.y()};
-        };
-    }
-
-    public static BakedQuad makeQuad(
-            TextureAtlasSprite sprite,
-            Vector3 posFrom,
-            Vector3 posTo,
-            Direction orientation,
-            Direction culling,
-            float[] uvs,
-            int uvRotation
-    ) {
-        return new FaceBakery().bakeQuad(
-                toVector3f(posFrom),
-                toVector3f(posTo),
-                new BlockElementFace(culling, -1, "", new BlockFaceUV(uvs, uvRotation)),
-                sprite,
-                orientation,
-                BlockModelRotation.X0_Y0,
-                null, // This is fine
-                true
-        );
-    }
-
     /**
-     * Reverses {@link FaceBakery#fillVertex}
+     * Clamp a quad to the given AABB in 0–16 model units, lerping UVs with positions.
      */
     public static BakedQuad trimQuad(BakedQuad quad, Vector3 corner1, Vector3 corner2) {
         Vector3 mins = new Vector3(
@@ -81,39 +27,51 @@ public class ModelUtil {
                 Math.max(corner1.z(), corner2.z())
         );
 
-        int[] vertexData = trimQuadVertices(quad.getVertices(), mins, maxes);
+        Vertex oldV1 = getVertex(quad, 0);
+        Vertex oldV2 = getVertex(quad, 1);
+        Vertex oldV3 = getVertex(quad, 2);
+        Vertex oldV4 = getVertex(quad, 3);
 
-        return new BakedQuad(
-                vertexData,
-                quad.getTintIndex(),
-                quad.getDirection(),
-                quad.getSprite(),
-                quad.isShade()
-        );
-    }
-
-    private static int[] trimQuadVertices(int[] vertexData, Vector3 mins, Vector3 maxes) {
-        int vertexSize = vertexData.length / 4;
-
-        Vertex oldV1 = getVertex(vertexData, 0, vertexSize);
-        Vertex oldV2 = getVertex(vertexData, 1, vertexSize);
-        Vertex oldV3 = getVertex(vertexData, 2, vertexSize);
-        Vertex oldV4 = getVertex(vertexData, 3, vertexSize);
-
-//        mins = new Vector3(0, 0, 0);
-//        maxes = new Vector3(16, 16, 16);
         Vertex newV1 = lerpVertexUVsInTriangle(oldV1.xyz().clamp(mins, maxes), oldV1, oldV2, oldV3);
         Vertex newV2 = lerpVertexUVsInTriangle(oldV2.xyz().clamp(mins, maxes), oldV1, oldV2, oldV3);
         Vertex newV3 = lerpVertexUVsInTriangle(oldV3.xyz().clamp(mins, maxes), oldV1, oldV2, oldV3);
         Vertex newV4 = lerpVertexUVsInTriangle(oldV4.xyz().clamp(mins, maxes), oldV1, oldV2, oldV3);
 
-        int[] newVertexData = Arrays.copyOf(vertexData, vertexData.length);
-        setVertex(newVertexData, 0, vertexSize, newV1);
-        setVertex(newVertexData, 1, vertexSize, newV2);
-        setVertex(newVertexData, 2, vertexSize, newV3);
-        setVertex(newVertexData, 3, vertexSize, newV4);
+        return new BakedQuad(
+                toBlockSpace(newV1),
+                toBlockSpace(newV2),
+                toBlockSpace(newV3),
+                toBlockSpace(newV4),
+                UVPair.pack((float) newV1.u, (float) newV1.v),
+                UVPair.pack((float) newV2.u, (float) newV2.v),
+                UVPair.pack((float) newV3.u, (float) newV3.v),
+                UVPair.pack((float) newV4.u, (float) newV4.v),
+                quad.direction(),
+                quad.materialInfo()
+        );
+    }
 
-        return newVertexData;
+    /**
+     * Translate a quad by a vector in 0–16 model units.
+     */
+    public static BakedQuad translateQuad(BakedQuad quad, Vector3 translation) {
+        Vertex v0 = getVertex(quad, 0).translate(translation);
+        Vertex v1 = getVertex(quad, 1).translate(translation);
+        Vertex v2 = getVertex(quad, 2).translate(translation);
+        Vertex v3 = getVertex(quad, 3).translate(translation);
+
+        return new BakedQuad(
+                toBlockSpace(v0),
+                toBlockSpace(v1),
+                toBlockSpace(v2),
+                toBlockSpace(v3),
+                UVPair.pack((float) v0.u, (float) v0.v),
+                UVPair.pack((float) v1.u, (float) v1.v),
+                UVPair.pack((float) v2.u, (float) v2.v),
+                UVPair.pack((float) v3.u, (float) v3.v),
+                quad.direction(),
+                quad.materialInfo()
+        );
     }
 
     private static Vertex lerpVertexUVsInTriangle(Vector3 pos, Vertex v1, Vertex v2, Vertex v3) {
@@ -124,17 +82,13 @@ public class ModelUtil {
     }
 
     private static Vector3 getLerpWeightsInSimplex(Vector3 pos, Vector3 v1, Vector3 v2, Vector3 v3) {
-        // Get the plane that the triangle (v1, v2, v3) lies on
         Vector3 side1 = v2.subtract(v1);
         Vector3 side2 = v3.subtract(v1);
         Vector3 normal = (side2).cross(side1).normalize();
 
-        // Project p to the plane
         double offset = pos.subtract(v1).dot(normal);
         Vector3 p = pos.subtract(normal.scale(offset));
 
-        // Find weights that lerp v1, v2, v3 to equal p
-        // See https://answers.unity.com/questions/383804/calculate-uv-coordinates-of-3d-point-on-plane-of-m.html
         Vector3 f1 = v1.subtract(p);
         Vector3 f2 = v2.subtract(p);
         Vector3 f3 = v3.subtract(p);
@@ -152,59 +106,33 @@ public class ModelUtil {
         return new Vector3(w1, w2, w3);
     }
 
-    private static Vertex getVertex(int[] vertexData, int index, int vertexSize) {
-        int i = index * vertexSize;
-
-        float x = Float.intBitsToFloat(vertexData[i]) * 16;
-        float y = Float.intBitsToFloat(vertexData[i + 1]) * 16;
-        float z = Float.intBitsToFloat(vertexData[i + 2]) * 16;
-        // float w = Float.intBitsToFloat(vertexData[i + 3]);
-        float u = Float.intBitsToFloat(vertexData[i + 4]);
-        float v = Float.intBitsToFloat(vertexData[i + 5]);
-
-        return new Vertex(x, y, z, u, v);
+    private static Vertex getVertex(BakedQuad quad, int index) {
+        Vector3fc pos = quad.position(index);
+        long packedUV = quad.packedUV(index);
+        return new Vertex(
+                pos.x() * 16.0,
+                pos.y() * 16.0,
+                pos.z() * 16.0,
+                UVPair.unpackU(packedUV),
+                UVPair.unpackV(packedUV)
+        );
     }
 
-    private static void setVertex(int[] vertexData, int index, int vertexSize, Vertex vertex) {
-        int i = index * vertexSize;
-
-        vertexData[i] = Float.floatToIntBits((float) vertex.x  / 16f);
-        vertexData[i + 1] = Float.floatToIntBits((float) vertex.y / 16f);
-        vertexData[i + 2] = Float.floatToIntBits((float) vertex.z / 16f);
-        // vertexData[i + 3] Not important
-        vertexData[i + 4] = Float.floatToIntBits((float) vertex.u);
-        vertexData[i + 5] = Float.floatToIntBits((float) vertex.v);
-    }
-
-    public static BakedQuad translateQuad(BakedQuad quad, Vector3 translation) {
-        int[] vertexData = Arrays.copyOf(quad.getVertices(), quad.getVertices().length);
-        translateVertex(vertexData, 0, translation);
-        translateVertex(vertexData, 1, translation);
-        translateVertex(vertexData, 2, translation);
-        translateVertex(vertexData, 3, translation);
-
-        return new BakedQuad(vertexData, quad.getTintIndex(), quad.getDirection(), quad.getSprite(), quad.isShade());
-    }
-
-    private static void translateVertex(int[] vertexData, int index, Vector3 translation) {
-        int vertexSize = vertexData.length / 4;
-        Vertex vertex = getVertex(vertexData, index, vertexSize);
-        setVertex(vertexData, index, vertexSize, new Vertex(
-                vertex.x + translation.x,
-                vertex.y + translation.y,
-                vertex.z + translation.z,
-                vertex.u,
-                vertex.v
-        ));
+    private static Vector3fc toBlockSpace(Vertex vertex) {
+        return new Vector3f(
+                (float) (vertex.x / 16.0),
+                (float) (vertex.y / 16.0),
+                (float) (vertex.z / 16.0)
+        );
     }
 
     private record Vertex(double x, double y, double z, double u, double v) {
         public Vector3 xyz() {
             return new Vector3(x, y, z);
         }
-    }
 
-    private static Vector3f toVector3f(Vector3 vec) {
-        return new Vector3f((float)vec.x, (float)vec.y, (float)vec.z);
+        public Vertex translate(Vector3 translation) {
+            return new Vertex(x + translation.x, y + translation.y, z + translation.z, u, v);
+        }
     }
 }

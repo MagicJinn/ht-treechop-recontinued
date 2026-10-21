@@ -3,10 +3,9 @@
   "minVersion": "0.8",
   "package": "ht.treechop.mixin",
   "compatibilityLevel": "JAVA_21",
-  "refmap": "treechop.mixins.refmap.json",
-  "mixins": [
-  ],
+  "mixins": [],
   "client": [
+    "LevelRendererDestroyOverlayMixin"
   ],
   "injectors": {
     "defaultRequire": 1

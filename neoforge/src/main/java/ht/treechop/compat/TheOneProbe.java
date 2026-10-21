@@ -9,7 +9,7 @@ import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 
 import java.util.function.Function;
 
-@EventBusSubscriber(modid = TreeChop.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = TreeChop.MOD_ID)
 public class TheOneProbe {
     @SubscribeEvent
     public static void enqueueModComms(InterModEnqueueEvent event) {

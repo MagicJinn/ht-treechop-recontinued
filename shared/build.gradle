@@ -5,6 +5,7 @@ plugins {
 dependencies {
     compileOnly "org.spongepowered:mixin:0.8.5"
     compileOnly "fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:$forgeconfigapiport_version"
+    compileOnly "maven.modrinth:jade:${project.jade_version_fabric}"
     compileOnly project(":tuber")
 }
 

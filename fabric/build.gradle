@@ -41,12 +41,12 @@ dependencies {
     implementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:$forgeconfigapiport_version"
     implementation "com.terraformersmc:modmenu:21.0.0"
 
-    compileOnly "mcp.mobius.waila:wthit-api:fabric-12.4.2"
-    runtimeOnly "mcp.mobius.waila:wthit:fabric-12.4.2"
-    runtimeOnly "lol.bai:badpackets:fabric-0.8.1"
+//    compileOnly "mcp.mobius.waila:wthit-api:fabric-12.4.2"
+//    runtimeOnly "mcp.mobius.waila:wthit:fabric-12.4.2"
+//    runtimeOnly "lol.bai:badpackets:fabric-0.8.1"
 
-    compileOnly "curse.maven:jade-324717:5571122"
-//    runtimeOnly "curse.maven:jade-324717:5571122"
+    compileOnly "maven.modrinth:jade:${project.jade_version_fabric}"
+    runtimeOnly "maven.modrinth:jade:${project.jade_version_fabric}"
 
 //    runtimeOnly "maven.modrinth:sodium:mc1.19.3-0.4.9" // Doesn't wanna work in IntelliJ
 //    runtimeOnly "curse.maven:indium-459496:3957480"
@@ -59,7 +59,7 @@ dependencies {
 //    runtimeOnly "curse.maven:bclib-495191:4677965"
 //    runtimeOnly "curse.maven:betterend-413596:4677967"
 
-    compileOnly "com.terraformersmc.terraform-api:terraform-wood-api-v1:10.0.0"
+//    compileOnly "com.terraformersmc.terraform-api:terraform-wood-api-v1:10.0.0"
 
 }
 

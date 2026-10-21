@@ -15,8 +15,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
 
 public abstract class Client {
     protected static final Permissions serverPermissions = new Permissions();
@@ -58,10 +60,10 @@ public abstract class Client {
 
     public static void toggleSettingsOverlay() {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.screen instanceof ClientSettingsScreen) {
-            minecraft.screen.onClose();
+        if (minecraft.gui.screen() instanceof ClientSettingsScreen) {
+            minecraft.gui.screen().onClose();
         } else {
-            minecraft.setScreen(new ClientSettingsScreen());
+            minecraft.gui.setScreen(new ClientSettingsScreen());
         }
     }
 
@@ -85,9 +87,8 @@ public abstract class Client {
 
     public static void handleUpdateChopsPacket(BlockPos pos, CompoundTag tag) {
         Level level = Minecraft.getInstance().level;
-        if (level != null && level.getBlockEntity(pos) instanceof ChoppedLogBlock.MyEntity entity) {
-            entity.loadWithComponents(tag, level.registryAccess());
-        }
+        if (level != null && level.getBlockEntity(pos) instanceof ChoppedLogBlock.MyEntity entity)
+            entity.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), tag));
     }
 
     public static Player getPlayer() {

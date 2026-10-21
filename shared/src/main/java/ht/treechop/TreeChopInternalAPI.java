@@ -59,7 +59,7 @@ public abstract class TreeChopInternalAPI implements TreeChopAPI {
         choppableBlockOverrides.put(block, isChoppable);
         print(String.format("set isChoppable=%s for block %s",
                 isChoppable,
-                TreeChop.platform.getResourceLocationForBlock(block)));
+                TreeChop.platform.getIdentifierForBlock(block)));
     }
 
     @Override
@@ -67,7 +67,7 @@ public abstract class TreeChopInternalAPI implements TreeChopAPI {
         leavesBlockOverrides.put(block, isLeaves);
         print(String.format("set isLeaves=%s for block %s",
                 isLeaves,
-                TreeChop.platform.getResourceLocationForBlock(block)));
+                TreeChop.platform.getIdentifierForBlock(block)));
     }
 
     @Override
@@ -75,21 +75,21 @@ public abstract class TreeChopInternalAPI implements TreeChopAPI {
         choppingItemOverrides.put(item, canChop);
         print(String.format("set canChop=%s for item %s",
                 canChop,
-                TreeChop.platform.getResourceLocationForItem(item)));
+                TreeChop.platform.getIdentifierForItem(item)));
     }
 
     @Override
     public void registerBlockBehavior(Block block, ITreeChopBlockBehavior handler) {
         blockBehaviors.put(block, handler);
         print(String.format("registered new behavior for block %s",
-                TreeChop.platform.getResourceLocationForBlock(block)));
+                TreeChop.platform.getIdentifierForBlock(block)));
     }
 
     @Override
     public boolean deregisterBlockBehavior(Block block) {
         ITreeChopBlockBehavior existing = blockBehaviors.remove(block);
         print(String.format("deregistered behavior for block %s",
-                TreeChop.platform.getResourceLocationForBlock(block)));
+                TreeChop.platform.getIdentifierForBlock(block)));
         return existing == null;
     }
 
@@ -117,14 +117,14 @@ public abstract class TreeChopInternalAPI implements TreeChopAPI {
     public void registerChoppingItemBehavior(Item item, IChoppingItem handler) {
         choppingItemBehaviors.put(item, handler);
         print(String.format("registered new behavior for item %s",
-                TreeChop.platform.getResourceLocationForItem(item)));
+                TreeChop.platform.getIdentifierForItem(item)));
     }
 
     @Override
     public boolean deregisterChoppingItemBehavior(Item item) {
         IChoppingItem existing = choppingItemBehaviors.remove(item);
         print(String.format("deregistered behavior for item %s",
-                TreeChop.platform.getResourceLocationForItem(item)));
+                TreeChop.platform.getIdentifierForItem(item)));
         return existing == null;
     }
 

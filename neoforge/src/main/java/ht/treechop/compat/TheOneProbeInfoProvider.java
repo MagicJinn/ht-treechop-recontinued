@@ -9,11 +9,11 @@ import mcjty.theoneprobe.apiimpl.elements.ElementText;
 import mcjty.theoneprobe.apiimpl.elements.ElementVertical;
 import mcjty.theoneprobe.apiimpl.styles.TextStyle;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,7 +22,7 @@ import java.util.Optional;
 
 class TheOneProbeInfoProvider implements IProbeInfoProvider {
     /** Identifies both {@link TheOneProbeInfoProvider} and {@link TheOneProbeInfoProvider.DeferredTreeDataElement} **/
-    public static final ResourceLocation ID = TreeChop.resource("tree_info");
+    public static final Identifier ID = TreeChop.resource("tree_info");
 
     private static final boolean SHOW_TREE_BLOCKS = true;
     private static final boolean SHOW_NUM_CHOPS_REMAINING = true;
@@ -36,7 +36,7 @@ class TheOneProbeInfoProvider implements IProbeInfoProvider {
                 return TheOneProbeInfoProvider.DeferredTreeDataElement.decode(buffer, styleManager);
             }
 
-            public ResourceLocation getId() {
+            public Identifier getId() {
                 return ID;
             }
         });
@@ -45,7 +45,7 @@ class TheOneProbeInfoProvider implements IProbeInfoProvider {
     }
 
     @Override
-    public ResourceLocation getID() {
+    public Identifier getID() {
         return ID;
     }
 
@@ -101,12 +101,12 @@ class TheOneProbeInfoProvider implements IProbeInfoProvider {
         }
 
         @Override
-        public ResourceLocation getID() {
+        public Identifier getID() {
             return ID;
         }
 
         @Override
-        public void render(GuiGraphics gui, int i, int i1) {
+        public void render(GuiGraphicsExtractor gui, int i, int i1) {
         }
 
         @Override

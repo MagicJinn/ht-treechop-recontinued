@@ -1,7 +1,5 @@
 package ht.treechop.client.gui.screen;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import ht.treechop.TreeChop;
 import ht.treechop.TreeChopException;
 import ht.treechop.client.Client;
@@ -10,7 +8,7 @@ import ht.treechop.client.settings.ClientChopSettings;
 import ht.treechop.common.chop.ChopUtil;
 import ht.treechop.common.config.ConfigHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -23,7 +21,7 @@ public class ChopIndicator {
 
     private static final double IMAGE_SCALE = 1.0;
 
-    public static void render(GuiGraphics gui, int windowWidth, int windowHeight) {
+    public static void render(GuiGraphicsExtractor gui, int windowWidth, int windowHeight) {
         Minecraft minecraft = Minecraft.getInstance();
         HitResult mouseOver = minecraft.hitResult;
         Player player = minecraft.player;
@@ -31,39 +29,29 @@ public class ChopIndicator {
         try {
             if (Client.isChoppingIndicatorEnabled() &&
                     player != null && !player.isSpectator() &&
-                    minecraft.level != null && minecraft.screen == null && mouseOver != null &&
+                    minecraft.level != null && minecraft.gui.screen() == null && mouseOver != null &&
                     mouseOver.getType() == HitResult.Type.BLOCK && mouseOver instanceof BlockHitResult &&
                     ChopUtil.playerWantsToChop(player, Client.getChopSettings())
             ) {
                 BlockPos blockPos = ((BlockHitResult) mouseOver).getBlockPos();
                 if (blockCanBeChopped(blockPos)) {
-                    RenderSystem.enableBlend();
-                    RenderSystem.blendFuncSeparate(
-                            GlStateManager.SourceFactor.ONE_MINUS_DST_COLOR,
-                            GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR,
-                            GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO
-                    );
-                    RenderSystem.setShaderTexture(0, Sprite.TEXTURE_PATH);
-
                     boolean mirror = player.getMainArm() == HumanoidArm.LEFT;
-                    int indicatorCenterX = windowWidth / 2 + ConfigHandler.CLIENT.indicatorXOffset.get() * (mirror ? -1 : 1);
-                    int indicatorCenterY = windowHeight / 2 + ConfigHandler.CLIENT.indicatorYOffset.get();
+                    int indicatorCenterX = gui.guiWidth() / 2
+                            + ConfigHandler.CLIENT.indicatorXOffset.get() * (mirror ? -1 : 1);
+                    int indicatorCenterY = gui.guiHeight() / 2 + ConfigHandler.CLIENT.indicatorYOffset.get();
 
                     Sprite sprite = Sprite.CHOP_INDICATOR;
                     int imageWidth = (int) (sprite.width * IMAGE_SCALE);
                     int imageHeight = (int) (sprite.height * IMAGE_SCALE);
 
-                    sprite.blit(
+                    sprite.blitMirror(
                             gui,
                             indicatorCenterX - imageWidth / 2,
                             indicatorCenterY - imageHeight / 2,
-                            imageWidth,
-                            imageHeight,
+                            1.0f,
+                            (float) IMAGE_SCALE,
                             mirror
                     );
-
-                    RenderSystem.defaultBlendFunc();
-                    RenderSystem.disableBlend();
                 }
             }
         } catch (Exception e) {
@@ -81,7 +69,8 @@ public class ChopIndicator {
             return false;
         }
 
-        boolean wantToChop = ChopUtil.canChopWithTool(player, level, pos) && ChopUtil.playerWantsToChop(minecraft.player, chopSettings);
+        boolean wantToChop = ChopUtil.canChopWithTool(player, level, pos)
+                && ChopUtil.playerWantsToChop(player, chopSettings);
         if (wantToChop) {
             return isAProperTree(pos, level, chopSettings);
         }

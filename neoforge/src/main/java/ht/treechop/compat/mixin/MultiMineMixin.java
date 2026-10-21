@@ -10,12 +10,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(MultiMineClient.class)
+@Mixin(value = MultiMineClient.class, remap = false)
 public class MultiMineMixin {
-    @Inject(method = "onClickBlock", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onClickBlock", at = @At("HEAD"), cancellable = true, remap = false)
     private static void injectOnClickBlock(PlayerInteractEvent.LeftClickBlock event, CallbackInfo ci) {
-        if (ConfigHandler.COMMON.compatForMultiMine.get() && ChopUtil.isBlockChoppable(event.getLevel(), event.getPos()) && ChopUtil.playerWantsToChop(event.getEntity(), Client.getChopSettings())) {
+        if (ConfigHandler.COMMON.compatForMultiMine.get() && ChopUtil.isBlockChoppable(event.getLevel(), event.getPos())
+                && ChopUtil.playerWantsToChop(event.getEntity(), Client.getChopSettings()))
             ci.cancel();
-        }
     }
 }

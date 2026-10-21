@@ -1,9 +1,10 @@
 package ht.treechop.client.gui.widget;
 
-import net.minecraft.client.gui.GuiGraphics;
 import ht.treechop.client.gui.util.Sprite;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -23,15 +24,14 @@ public class ToggleWidget extends AbstractWidget {
         this.stateSupplier = stateSupplier;
     }
 
-    public void onClick(double mouseX, double mouseY) {
+    @Override
+    public void onClick(MouseButtonEvent event, boolean doubleClick) {
         onPress.run();
     }
 
     @Override
-    public void renderWidget(GuiGraphics gui, int mouseX, int mouseY, float partialTicks) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor gui, int mouseX, int mouseY, float partialTicks) {
         this.active = !stateSupplier.get().isLocked;
-
-        Sprite.setRenderState(this.alpha);
 
         final EnumMap<State, Sprite> spriteForState = new EnumMap<State, Sprite>(Stream.of(
                 Pair.of(State.OFF, Sprite.TOGGLE_BUTTON_OFF),
@@ -49,7 +49,7 @@ public class ToggleWidget extends AbstractWidget {
 
         State state = stateSupplier.get();
         Sprite sprite = isHoveredOrFocused() ? spriteForHoveredState.get(state) : spriteForState.get(state);
-        sprite.blit(gui, getX(), getY());
+        sprite.blit(gui, getX(), getY(), this.alpha);
     }
 
     @Override

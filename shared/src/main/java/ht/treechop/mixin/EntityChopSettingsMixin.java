@@ -5,13 +5,15 @@ import ht.treechop.common.settings.ChoppingEntity;
 import ht.treechop.common.settings.SyncedChopData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Entity.class)
+@Mixin(value = Entity.class, remap = false)
 public class EntityChopSettingsMixin implements ChoppingEntity {
     private SyncedChopData chopSettings;
     private final String KEY = "treechop:chopSettings";
@@ -27,16 +29,16 @@ public class EntityChopSettingsMixin implements ChoppingEntity {
         return chopSettings;
     }
 
-    @Inject(method = "saveWithoutId", at = @At("HEAD"))
-    public void injectDataSaving(CompoundTag tag, CallbackInfoReturnable<CompoundTag> info) {
+    @Inject(method = "saveWithoutId", at = @At("HEAD"), remap = false)
+    public void injectDataSaving(ValueOutput output, CallbackInfo info) {
         if (chopSettings != null) {
-            tag.put(KEY, chopSettings.makeSaveData());
+            output.store(KEY, CompoundTag.CODEC, chopSettings.makeSaveData());
         }
     }
 
-    @Inject(method = "load", at = @At("HEAD"))
-    public void injectDataLoading(CompoundTag tag, CallbackInfo info) {
-        CompoundTag data = tag.getCompound(KEY);
+    @Inject(method = "load", at = @At("HEAD"), remap = false)
+    public void injectDataLoading(ValueInput input, CallbackInfo info) {
+        CompoundTag data = input.read(KEY, CompoundTag.CODEC).orElseGet(CompoundTag::new);
         chopSettings = (new SyncedChopData(new ChopSettings())).readSaveData(data);
     }
 }

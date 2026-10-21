@@ -16,15 +16,33 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(MultiPlayerGameMode.class)
+/**
+ * Client mining feedback for TreeChop. When a chop does not fell the tree, the
+ * block stays at the same position. Vanilla {@code continueDestroyBlock} then
+ * resumes via {@code sameDestroyTarget} without calling
+ * {@code startDestroyBlock}, so hit particles, break sounds, and
+ * START_DESTROY_BLOCK never fire again until the player releases and re-clicks
+ * (MC-255057). Require {@code isDestroying} so a new start runs after each
+ * chop.
+ */
+@Mixin(value = MultiPlayerGameMode.class, remap = false)
 public abstract class MultiPlayerGameModeMixin {
-    @Shadow() @Final private Minecraft minecraft;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
 
-    @Shadow() public abstract boolean isServerControlledInventory();
+    @Shadow
+    private boolean isDestroying;
 
-    @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
+    @Shadow
+    private boolean sameDestroyTarget(BlockPos pos) {
+        throw new AssertionError();
+    }
+
+    @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true, remap = false)
     public void dontPredictBlockBreak(BlockPos pos, CallbackInfoReturnable<Boolean> info) {
         try {
             Player player = minecraft.player;
@@ -44,5 +62,10 @@ public abstract class MultiPlayerGameModeMixin {
         } catch (TreeChopException e) {
             // Ignore
         }
+    }
+
+    @Redirect(method = "continueDestroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;sameDestroyTarget(Lnet/minecraft/core/BlockPos;)Z"), remap = false)
+    private boolean sameDestroyTargetOnlyWhileDestroying(MultiPlayerGameMode self, BlockPos pos) {
+        return sameDestroyTarget(pos) && this.isDestroying;
     }
 }

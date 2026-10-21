@@ -1,5 +1,5 @@
 {
-  "variants": {
-    "chopped_log": { "model": "treechop:block/chopped_log" }
+  "textures": {
+    "particle": "minecraft:block/stripped_oak_log"
   }
 }

@@ -32,7 +32,9 @@ public class Chop {
         if (choppableBlock != null) {
             choppableBlock.chop(player, tool, level, blockPos, blockState, numChops, felling);
         } else {
-            TreeChop.LOGGER.warn("Failed to chop block in level {} at position {} for player {}: {} is not choppable", level.dimension(), blockPos, player.getName(), TreeChop.platform.getResourceLocationForBlock(blockState.getBlock()));
+            TreeChop.LOGGER.warn("Failed to chop block in level {} at position {} for player {}: {} is not choppable",
+                    level.dimension(), blockPos, player.getName(),
+                    TreeChop.platform.getIdentifierForBlock(blockState.getBlock()));
         }
     }
 }
