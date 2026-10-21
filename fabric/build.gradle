@@ -90,6 +90,9 @@ loom {
 }
 
 tasks.withType(JavaCompile).configureEach {
+// Only main compile needs shared/tuber sources. compileTestJava must not get them:
+// Jade is compileOnly, so it is absent from testCompileClasspath.
+tasks.named("compileJava", JavaCompile).configure {
     source(project(":shared").sourceSets.main.allSource)
     source(project(":tuber").sourceSets.main.allSource)
 }
