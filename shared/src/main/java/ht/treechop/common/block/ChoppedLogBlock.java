@@ -6,7 +6,6 @@ import ht.treechop.client.SafeClient;
 import ht.treechop.common.chop.ChopUtil;
 import ht.treechop.common.config.ConfigHandler;
 import ht.treechop.common.loot.TreeChopLootContextParams;
-import ht.treechop.common.network.ServerUpdateChopsPacket;
 import ht.treechop.common.properties.ChoppedLogShape;
 import ht.treechop.common.util.ClassUtil;
 import ht.treechop.common.util.FaceShape;
@@ -440,9 +439,8 @@ public abstract class ChoppedLogBlock extends BlockImitator implements IChoppabl
         }
 
         private void syncWithClients() {
-            if (level instanceof ServerLevel serverLevel) {
-                Server.instance().broadcast(serverLevel, worldPosition, new ServerUpdateChopsPacket(worldPosition, getUpdateTag(level.registryAccess())));
-            }
+            if (level instanceof ServerLevel serverLevel)
+                Server.instance().syncChopUpdate(serverLevel, worldPosition, getUpdateTag(level.registryAccess()));
         }
 
         protected void rerender() {

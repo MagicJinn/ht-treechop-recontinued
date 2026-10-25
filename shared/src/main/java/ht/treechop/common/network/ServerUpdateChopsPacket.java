@@ -10,6 +10,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class ServerUpdateChopsPacket implements CustomPacketPayload {
     public static final Identifier ID = TreeChop.resource("server_update_chops");
     public static final CustomPacketPayload.Type<ServerUpdateChopsPacket> TYPE = new CustomPacketPayload.Type<>(ID);
@@ -17,39 +21,50 @@ public class ServerUpdateChopsPacket implements CustomPacketPayload {
             ServerUpdateChopsPacket::encode, ServerUpdateChopsPacket::decode
     );
 
-    private final BlockPos pos;
-    private final CompoundTag tag;
+    private final List<Entry> updates;
 
     public ServerUpdateChopsPacket(BlockPos pos, CompoundTag tag) {
-        this.pos = pos;
-        this.tag = tag;
+        this(Collections.singletonList(new Entry(pos, tag)));
+    }
+
+    public ServerUpdateChopsPacket(List<Entry> updates) {
+        this.updates = updates;
     }
 
     public void encode(FriendlyByteBuf buffer) {
-        buffer.writeBlockPos(pos);
-        buffer.writeNbt(tag);
+        buffer.writeVarInt(updates.size());
+        for (Entry entry : updates) {
+            buffer.writeBlockPos(entry.pos());
+            buffer.writeNbt(entry.tag());
+        }
     }
 
     public static ServerUpdateChopsPacket decode(FriendlyByteBuf buffer) {
-        BlockPos pos = buffer.readBlockPos();
-        CompoundTag tag = buffer.readNbt();
-        return new ServerUpdateChopsPacket(pos, tag);
+        int count = buffer.readVarInt();
+        List<Entry> updates = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            BlockPos pos = buffer.readBlockPos();
+            CompoundTag tag = buffer.readNbt();
+            updates.add(new Entry(pos, tag));
+        }
+        return new ServerUpdateChopsPacket(updates);
     }
 
     public void handle() {
-        Client.handleUpdateChopsPacket(pos, tag);
+        for (Entry entry : updates) {
+            Client.handleUpdateChopsPacket(entry.pos(), entry.tag());
+        }
     }
 
-    public BlockPos getPos() {
-        return pos;
-    }
-
-    public CompoundTag getTag() {
-        return tag;
+    public List<Entry> getUpdates() {
+        return updates;
     }
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
+    }
+
+    public record Entry(BlockPos pos, CompoundTag tag) {
     }
 }

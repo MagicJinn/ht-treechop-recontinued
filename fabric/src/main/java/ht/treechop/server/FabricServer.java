@@ -55,10 +55,15 @@ public class FabricServer extends Server implements DedicatedServerModInitialize
         SyncedChopData data = super.getPlayerChopData(player);
         // Vanilla clients cannot configure settings, so use server defaults.
         if (player instanceof ServerPlayer serverPlayer
-                && !ServerPlayNetworking.canSend(serverPlayer, ServerUpdateChopsPacket.TYPE))
+                && !ServerPlayNetworking.canSend(serverPlayer, ServerUpdateChopsPacket.TYPE)) {
             data.getSettings().copyFrom(getDefaultPlayerSettings());
-
+        }
         return data;
+    }
+
+    @Override
+    protected Iterable<ServerPlayer> trackingPlayers(ServerLevel level, BlockPos pos) {
+        return PlayerLookup.tracking(level, pos);
     }
 
     @Override

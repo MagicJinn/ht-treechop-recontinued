@@ -8,6 +8,7 @@ import ht.treechop.common.config.FellCreditStrategy;
 import ht.treechop.common.config.FellLeavesStrategy;
 import ht.treechop.common.util.ClassUtil;
 import ht.treechop.common.util.LevelUtil;
+import ht.treechop.server.Server;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,7 +47,8 @@ public class FellTreeResult implements ChopResult {
         if (level instanceof ServerLevel serverLevel && !serverLevel.getBlockState(targetPos).isAir() && !player.blockActionRestricted(serverLevel, targetPos, gameType)) {
             boolean fell = TreeChop.platform.startFellTreeEvent(player, level, targetPos, fellData);
 
-            chops.forEach(chop -> chop.apply(level, player, tool, fell));
+            Server.instance().runWithChopSyncBatch(() ->
+                    chops.forEach(chop -> chop.apply(level, player, tool, fell)));
 
             if (fell) {
                 Consumer<BlockPos> blockBreaker = makeBlockBreaker(player, serverLevel);

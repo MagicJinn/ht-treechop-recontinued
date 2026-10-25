@@ -28,6 +28,11 @@ public class NeoForgeServer extends Server {
     }
 
     @Override
+    protected Iterable<ServerPlayer> trackingPlayers(ServerLevel level, BlockPos pos) {
+        return level.getChunkSource().chunkMap.getPlayers(ChunkPos.containing(pos), false);
+    }
+
+    @Override
     public void broadcast(ServerLevel level, BlockPos pos, CustomPacketPayload payload) {
         PacketDistributor.sendToPlayersTrackingChunk(level, ChunkPos.containing(pos), payload);
     }

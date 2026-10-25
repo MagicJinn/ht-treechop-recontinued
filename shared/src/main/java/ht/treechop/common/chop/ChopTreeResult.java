@@ -1,5 +1,6 @@
 package ht.treechop.common.chop;
 
+import ht.treechop.server.Server;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +25,7 @@ public class ChopTreeResult implements ChopResult {
             return;
         }
 
-        chops.forEach(chop -> chop.apply(level, agent, tool, false));
+        Server.instance().runWithChopSyncBatch(() ->
+                chops.forEach(chop -> chop.apply(level, agent, tool, false)));
     }
 }

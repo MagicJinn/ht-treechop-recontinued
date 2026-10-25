@@ -15,7 +15,9 @@ public class SafeClient {
 
     public static void handleUpdateChopsPacket(ServerUpdateChopsPacket message) {
         if (safe()) {
-            Client.handleUpdateChopsPacket(message.getPos(), message.getTag());
+            for (ServerUpdateChopsPacket.Entry entry : message.getUpdates()) {
+                Client.handleUpdateChopsPacket(entry.pos(), entry.tag());
+            }
         }
     }
 
