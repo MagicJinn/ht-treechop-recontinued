@@ -41,4 +41,18 @@ public interface Platform {
     boolean startFellTreeEvent(ServerPlayer player, Level level, BlockPos choppedPos, FellData fellData);
 
     void finishFellTreeEvent(ServerPlayer player, Level level, BlockPos choppedPos, FellData fellData);
+
+    /**
+     * Extra phase-change FX for clients without TreeChop (Polymer).
+     * TreeChop clients already get sound/particles from client prediction.
+     */
+    default void playPhaseChangeFeedback(ServerPlayer player, BlockPos pos, BlockState fxState) {
+    }
+
+    /**
+     * Refresh Polymer chopped-log block after BE original state / chops are set.
+     */
+    default void refreshChoppedLogDisplay(Level level, BlockPos pos) {
+        // No-op when Polymer is absent.
+    }
 }

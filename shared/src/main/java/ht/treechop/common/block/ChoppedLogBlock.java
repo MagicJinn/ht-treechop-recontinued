@@ -217,6 +217,8 @@ public abstract class ChoppedLogBlock extends BlockImitator implements IChoppabl
                     entity.setChops(newNumChops);
                     entity.setChanged();
                 }
+                // After originalState/chops set, Polymer display can attach with correct wood
+                TreeChop.platform.refreshChoppedLogDisplay(level, pos);
             } else {
                 level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
             }

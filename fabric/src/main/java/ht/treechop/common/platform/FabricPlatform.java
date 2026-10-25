@@ -4,6 +4,7 @@ import ht.treechop.api.*;
 import ht.treechop.common.chop.ChopResult;
 import ht.treechop.common.chop.FellTreeResult;
 import ht.treechop.common.registry.FabricModBlocks;
+import ht.treechop.compat.polymer.PolymerFx;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
@@ -101,5 +102,15 @@ public class FabricPlatform implements Platform {
     @Override
     public BlockState getStrippedState(BlockGetter level, BlockPos pos, BlockState state) {
         return null;
+    }
+
+    @Override
+    public void playPhaseChangeFeedback(ServerPlayer player, BlockPos pos, BlockState fxState) {
+        PolymerFx.play(player, pos, fxState);
+    }
+
+    @Override
+    public void refreshChoppedLogDisplay(Level level, BlockPos pos) {
+        PolymerFx.refreshDisplay(level, pos);
     }
 }

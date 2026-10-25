@@ -2,6 +2,7 @@ package ht.treechop.server;
 
 import ht.treechop.common.network.ClientRequestSettingsPacket;
 import ht.treechop.common.network.PacketChannel;
+import ht.treechop.common.network.ServerUpdateChopsPacket;
 import ht.treechop.common.settings.ChoppingEntity;
 import ht.treechop.common.settings.SyncedChopData;
 import net.fabricmc.api.DedicatedServerModInitializer;
@@ -12,12 +13,21 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+
+import java.util.function.BiPredicate;
 
 public class FabricServer extends Server implements DedicatedServerModInitializer {
+
+    private static BiPredicate<ServerPlayer, CustomPacketPayload> packetFilter = (player, payload) -> true;
 
     @Override
     public void onInitializeServer() {
         // Only run on dedicated servers, not local servers!
+    }
+
+    public static void setPacketFilter(BiPredicate<ServerPlayer, CustomPacketPayload> filter) {
+        packetFilter = filter;
     }
 
     public static void initialize() {
@@ -41,14 +51,26 @@ public class FabricServer extends Server implements DedicatedServerModInitialize
     }
 
     @Override
+    public SyncedChopData getPlayerChopData(Player player) {
+        SyncedChopData data = super.getPlayerChopData(player);
+        // Vanilla clients cannot configure settings, so use server defaults.
+        if (player instanceof ServerPlayer serverPlayer
+                && !ServerPlayNetworking.canSend(serverPlayer, ServerUpdateChopsPacket.TYPE))
+            data.getSettings().copyFrom(getDefaultPlayerSettings());
+
+        return data;
+    }
+
+    @Override
     public void broadcast(ServerLevel level, BlockPos pos, CustomPacketPayload payload) {
         for (ServerPlayer player : PlayerLookup.tracking(level, pos)) {
-            instance().sendTo(player, payload);
+            sendTo(player, payload);
         }
     }
 
     @Override
     public void sendTo(ServerPlayer player, CustomPacketPayload payload) {
-        ServerPlayNetworking.send(player, payload);
+        if (packetFilter.test(player, payload))
+            ServerPlayNetworking.send(player, payload);
     }
 }

@@ -26,6 +26,12 @@ jar {
 repositories {
     maven { url = "https://maven.fabricmc.net" }
     maven { url = "https://maven.terraformersmc.com/" }
+    maven { url = "https://maven.nucleoid.xyz" }
+}
+
+configurations {
+    localRuntime
+    runtimeClasspath.extendsFrom localRuntime
 }
 
 dependencies {
@@ -61,6 +67,10 @@ dependencies {
 
 //    compileOnly "com.terraformersmc.terraform-api:terraform-wood-api-v1:10.0.0"
 
+    // Optional Polymer
+    compileOnly "eu.pb4:polymer-bundled:$polymer_version"
+    compileOnly "eu.pb4:polymer-sound-patcher:$polymer_version"
+    localRuntime "eu.pb4:polymer-bundled:$polymer_version"
 }
 
 processResources {

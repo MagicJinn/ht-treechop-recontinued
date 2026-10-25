@@ -256,15 +256,31 @@ public class ChopUtil {
         } else {
             final float volume = .3f;
             final float pitch = 1f;
-            // Client: playLocalSound always hears. Server: playSound(except thwacker) for
-            // others.
+            // Prefer stripped original wood so particles are not incorrect
+            BlockState fxState = phaseChangeFxState(level, pos, state);
+
             if (level.isClientSide()) {
                 level.playLocalSound(pos, TreeChop.CHOP_WOOD_EVENT.get(), SoundSource.BLOCKS, volume, pitch, false);
+                level.addDestroyBlockEffect(pos, fxState);
             } else {
                 level.playSound(thwacker, pos, TreeChop.CHOP_WOOD_EVENT.get(), SoundSource.BLOCKS, volume, pitch);
+                level.addDestroyBlockEffect(pos, fxState);
+                if (thwacker instanceof ServerPlayer serverPlayer)
+                    TreeChop.platform.playPhaseChangeFeedback(serverPlayer, pos, fxState);
             }
-            level.addDestroyBlockEffect(pos, state);
         }
+}
+
+    /**
+     * Vanilla-safe block for chop FX (Polymer clients cannot render chopped_log
+     * particles).
+     */
+    public static BlockState phaseChangeFxState(Level level, BlockPos pos, BlockState state) {
+        if (level.getBlockEntity(pos) instanceof ChoppedLogBlock.MyEntity entity) {
+            BlockState original = entity.getOriginalState();
+            return getStrippedState(level, pos, original, original);
+        }
+        return getStrippedState(level, pos, state, state);
     }
 
     public static BlockState getStrippedState(BlockGetter level, BlockPos pos, BlockState state) {

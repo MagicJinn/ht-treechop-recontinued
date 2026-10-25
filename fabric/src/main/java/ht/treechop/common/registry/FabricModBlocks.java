@@ -2,6 +2,8 @@ package ht.treechop.common.registry;
 
 import ht.treechop.TreeChop;
 import ht.treechop.common.block.FabricChoppedLogBlock;
+import ht.treechop.common.block.PolymerFabricChoppedLogBlock;
+import ht.treechop.compat.polymer.TreeChopPolymerClients;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -9,6 +11,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 
@@ -17,15 +20,23 @@ public class FabricModBlocks {
 
     public static final ResourceKey<Block> CHOPPED_LOG_KEY = ResourceKey.create(Registries.BLOCK, TreeChop.resource("chopped_log"));
 
-    public static final Block CHOPPED_LOG = new FabricChoppedLogBlock(
-            Block.Properties.of()
-                    .setId(CHOPPED_LOG_KEY)
-                    .mapColor(MapColor.WOOD)
-                    .instrument(NoteBlockInstrument.BASS)
-                    .strength(2.0F)
-                    .sound(SoundType.WOOD)
-                    .ignitedByLava()
-    );
+    public static final Block CHOPPED_LOG = createChoppedLog();
 
-    public static final BlockEntityType<FabricChoppedLogBlock.MyEntity> CHOPPED_LOG_ENTITY = FabricBlockEntityTypeBuilder.create(FabricChoppedLogBlock.MyEntity::new, CHOPPED_LOG).build();
+    public static final BlockEntityType<FabricChoppedLogBlock.MyEntity> CHOPPED_LOG_ENTITY = FabricBlockEntityTypeBuilder
+            .create(FabricChoppedLogBlock.MyEntity::new, CHOPPED_LOG).build();
+
+    private static Block createChoppedLog() {
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of()
+                .setId(CHOPPED_LOG_KEY)
+                .mapColor(MapColor.WOOD)
+                .instrument(NoteBlockInstrument.BASS)
+                .strength(2.0F)
+                .sound(SoundType.WOOD)
+                .ignitedByLava();
+
+        if (TreeChopPolymerClients.isPolymerLoaded())
+            return new PolymerFabricChoppedLogBlock(properties);
+
+        return new FabricChoppedLogBlock(properties);
+    }
 }
