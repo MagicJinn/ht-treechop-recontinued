@@ -73,10 +73,8 @@ dependencies {
 
 //    localRuntime "curse.maven:create-328085:4835191"
 
-    // Compile against the API
-    compileOnly "mcp.mobius.waila:wthit-api:neo-12.5.1"
-
-    // Run against the full jar
+    // WTHIT: no 26.3 build yet. Keep disabled
+//    compileOnly "mcp.mobius.waila:wthit-api:neo-12.5.1"
 //    localRuntime "mcp.mobius.waila:wthit:neo-12.5.1"
 //    localRuntime "lol.bai:badpackets:neo-0.8.1"
 
@@ -150,6 +148,8 @@ sourceSets.main.java {
 
 sourceSets.main.resources {
     srcDir "src/generated/resources"
+    // Do not register a WTHIT plugin while Wthit.java is excluded
+    exclude 'wthit_plugins.json'
 }
 
 sourceSets.each {

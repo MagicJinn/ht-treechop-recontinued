@@ -1,18 +1,18 @@
 # HT's TreeChop
 
-For a more fun description, see [CurseForge](https://www.curseforge.com/minecraft/mc-mods/treechop) or [Modrinth](https://modrinth.com/mod/treechop).
+[![Modrinth: HT's TreeChop](https://img.shields.io/badge/Modrinth-HT's_TreeChop-00ae5d?logo=modrinth)](https://modrinth.com/mod/ht-treechop-recontinued) [![CurseForge: HT's TreeChop](https://img.shields.io/badge/CurseForge-HT's_TreeChop-f16437?logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/ht-treechop-recontinued)
 
-## Are trees leaving behind floating blocks?
+## Polymer (Fabric servers)
 
-Let me know [here](https://github.com/hammertater/treechop/issues/44)!
+On **Fabric**, add [Polymer](https://modrinth.com/mod/polymer) to the server and vanilla clients can join and chop trees with you. Polymer makes the mod accessible to vanilla clients via a resource pack, so players without TreeChop still see and mine them properly. Players who already have TreeChop keep the full mod experience either way.
 
 ## Is something not working correctly?
 
-Send me a log! See [how to find and share Minecraft logs](https://github.com/hammertater/treechop/blob/main/docs/retrieve_latest_log.md).
+Send me a log! See [how to find and share Minecraft logs](https://github.com/MagicJinn/ht-treechop-recontinued/blob/main/docs/retrieve_latest_log.md).
 
 ## Want to make your mod compatible with TreeChop?
 
-See the wiki - <https://github.com/hammertater/treechop/wiki/Adding-compatibility-with-TreeChop>
+See the wiki - <https://github.com/MagicJinn/ht-treechop-recontinued/wiki/Adding-compatibility-with-TreeChop>
 
 ## Configuring chop counting (version 0.13.0 and later)
 <!-- For generating equation svgs: https://www.codecogs.com/latex/eqneditor.php-->
@@ -28,7 +28,7 @@ The `algorithm` used to determine the number of chops can be set to any of the o
 The linear algorithm follows the function
 
 <!--\#chops = \mathbf{chopsPerBlock} \cdot \#blocks + \mathbf{baseNumChops}-->
-![linear_formula](docs/linear_formula.png)
+![linear_formula](https://raw.githubusercontent.com/MagicJinn/ht-treechop-recontinued/main/docs/linear_formula.png)
 
 where `chopsPerBlock` and `baseNumChops` are configurable and the actual number of chops required is rounded either `UP`, `DOWN`, or to the `NEAREST` whole number depending on the `chopCountRounding` configuration.
 
@@ -41,13 +41,13 @@ If `chopsPerBlock > 1` or `baseNumChops > 0`, then you should consider the setti
 The logarithmic algorithm follows the function
 
 <!--\#chops = 1 + \mathbf{a} \cdot log \left(1 + \frac{\#blocks - 1}{\mathbf{a}} \right)-->
-![log formula](docs/log_formula.png)
+![log formula](https://raw.githubusercontent.com/MagicJinn/ht-treechop-recontinued/main/docs/log_formula.png)
 
 where the parameter `a` is configurable and controls the steepness of the curve as the tree size (*#blocks*) increases.
 
 The figure and tables below show how `a` affects the number of chops required for different tree sizes. The default value `a = 10` results in the gray curve. At the extremes, if `a = 0`, then any size tree will only require one chop, and if `a = ∞`, then felling a tree will require the same amount of chops as there are blocks (the red curve).
 
-![log curves](docs/log_curves.svg)
+![log curves](https://raw.githubusercontent.com/MagicJinn/ht-treechop-recontinued/main/docs/log_curves.svg)
 
 The actual number of chops required depends on the rounding method (`chopCountRounding`), which may be `DOWN`, `NEAREST`, or `UP`.
 

@@ -47,6 +47,7 @@ dependencies {
     implementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:$forgeconfigapiport_version"
     implementation "com.terraformersmc:modmenu:21.0.0"
 
+    // WTHIT: no 26.3 build yet. Keep disabled.
 //    compileOnly "mcp.mobius.waila:wthit-api:fabric-12.4.2"
 //    runtimeOnly "mcp.mobius.waila:wthit:fabric-12.4.2"
 //    runtimeOnly "lol.bai:badpackets:fabric-0.8.1"
