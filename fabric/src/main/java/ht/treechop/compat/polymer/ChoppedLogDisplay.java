@@ -6,20 +6,24 @@ import eu.pb4.polymer.virtualentity.api.attachment.HolderAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import ht.treechop.common.block.ChoppedLogBlock;
 import ht.treechop.common.chop.ChopUtil;
+import ht.treechop.common.properties.ChoppedLogShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.joml.Vector3f;
 
 /**
  * Scaled stripped-log BlockDisplay over the Polymer empty stand-in.
  * <p>
- * The display is not attached until {@link #refresh()} / first successful
- * {@code apply}, so place-time watchers never get a hardcoded oak before
- * {@code setOriginalState}.
+ * Scale/translation follow {@link ChoppedLogShape#getBoundingBox(int)} so the
+ * display shrinks toward open sides (same silhouette as collision / vanilla
+ * models). UVs are stretched on non-uniform scales. The display is not attached
+ * until {@link #refresh()} / first successful {@code apply}, so place-time
+ * watchers never get a hardcoded oak before {@code setOriginalState}.
  */
 public class ChoppedLogDisplay extends ElementHolder {
     private final BlockDisplayElement display = new BlockDisplayElement();
@@ -56,7 +60,8 @@ public class ChoppedLogDisplay extends ElementHolder {
     }
 
     /**
-     * Apply BE wood/radius now and flush dirty display data to current watchers.
+     * Apply BE wood/shape/radius now and flush dirty display data to current
+     * watchers.
      */
     public void refresh() {
         refreshFromWorld();
@@ -73,23 +78,32 @@ public class ChoppedLogDisplay extends ElementHolder {
             return;
 
         if (attachment.getWorld().getBlockEntity(attachment.getBlockPos()) instanceof ChoppedLogBlock.MyEntity entity)
-            apply(entity.getOriginalState(), entity.getRadius(), attachment.getWorld(), attachment.getBlockPos());
+            apply(entity.getOriginalState(), entity.getShape(), entity.getRadius(), attachment.getWorld(),
+                    attachment.getBlockPos());
     }
 
-    private void apply(BlockState original, int radius, Level level, BlockPos pos) {
+    private void apply(BlockState original, ChoppedLogShape shape, int radius, Level level, BlockPos pos) {
         radius = Mth.clamp(radius, 1, 8);
         BlockState shown = ChopUtil.getStrippedState(level, pos, original, original);
-        int key = System.identityHashCode(shown.getBlock()) * 31 + radius + Block.getId(shown);
+        int key = System.identityHashCode(shown.getBlock()) * 31 + radius + Block.getId(shown)
+                + 31 * shape.ordinal();
         if (key == lastKey)
             return;
 
         lastKey = key;
 
-        float scaleXZ = radius / 8f;
-        float inset = (1f - scaleXZ) / 2f;
+        // Shape AABB is in 0–16 model units. Holder is at block center, so
+        // translation is min-corner relative to center and scale is box size.
+        AABB box = shape.getBoundingBox(radius);
+        float scaleX = (float) (box.getXsize() / 16.0);
+        float scaleY = (float) (box.getYsize() / 16.0);
+        float scaleZ = (float) (box.getZsize() / 16.0);
         this.display.setBlockState(shown);
-        this.display.setScale(new Vector3f(scaleXZ, 1f, scaleXZ));
-        this.display.setTranslation(new Vector3f(-0.5f + inset, -0.5f, -0.5f + inset));
+        this.display.setScale(new Vector3f(scaleX, scaleY, scaleZ));
+        this.display.setTranslation(new Vector3f(
+                (float) (box.minX / 16.0) - 0.5f,
+                (float) (box.minY / 16.0) - 0.5f,
+                (float) (box.minZ / 16.0) - 0.5f));
 
         // Defer attach until wood type is known so setBlock watchers never spawn
         // stripped oak.
