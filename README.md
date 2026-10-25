@@ -2,7 +2,7 @@
 
 ![HT's TreeChop](https://raw.githubusercontent.com/MagicJinn/ht-treechop-recontinued/refs/heads/main/icon.png)
 
-[![Modrinth: HT's TreeChop](https://img.shields.io/badge/Modrinth-HT%27s_TreeChop-00ae5d?logo=modrinth)](https://modrinth.com/mod/ht-treechop-recontinued) [![CurseForge: HT's TreeChop](https://img.shields.io/badge/CurseForge-HT%27s_TreeChop-f16437?logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/ht-treechop-recontinued)
+[![Modrinth: HT's TreeChop Recontinued](https://img.shields.io/badge/Modrinth-HT%27s_TreeChop_Recontinued-00ae5d?logo=modrinth)](https://modrinth.com/mod/hts-treechop-recontinued) [![CurseForge: HT's TreeChop Recontinued](https://img.shields.io/badge/CurseForge-HT%27s_TreeChop_Recontinued-f16437?logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/hts-treechop-recontinued-polymer)
 
 Allows trees to be chopped down by repeatedly breaking a single block. The whole tree will only break after a certain number of chops, and bigger trees require more chops. Inspired by mods like Treecapitator.
 
