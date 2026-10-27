@@ -24,7 +24,7 @@ Allows trees to be chopped down by repeatedly breaking a single block. The whole
 - Bigger trees require more total chops, but fewer chops per block
 - Hold sneak when breaking a log block to break it normally
 
-*By default, the number of chops required to fell a tree is computed logarithmically. Some example numbers are below. The number of chops can also be configured to scale linearly with the number of blocks (for example, one chop per block, or a flat number of chops per tree). See [Configuring chop counting](#configuring-chop-counting).*
+*By default, the number of chops required to fell a tree is computed logarithmically. Some example numbers are below. The number of chops can also be configured to scale linearly with the number of blocks (for example, one chop per block, or a flat number of chops per tree).*
 
 | Tree blocks | Chops required |
 | ------------: | ---------------: |
@@ -47,12 +47,12 @@ Special support for:
 - **Jade**: show number of log blocks in trees and the number of chops needed to fell
 - **Polymer** (Fabric): vanilla-client support on dedicated servers
 
-Want to make your mod compatible with TreeChop? See the [wiki](https://github.com/MagicJinn/ht-treechop-recontinued/wiki/Adding-compatibility-with-TreeChop) and [docs/compatibility.md](docs/compatibility.md).
+Want to make your mod compatible with TreeChop? See the [wiki](https://github.com/MagicJinn/ht-treechop-recontinued/wiki/Adding-compatibility-with-TreeChop) and [docs/compatibility](https://github.com/MagicJinn/ht-treechop-recontinued/blob/main/docs/compatibility.md).
 
 ## Known issues
 
 - Some modded trees leave floating blocks when felled. Report these on the issues tab!
-- If something crashes or stops chopping, send a log! See [how to find and share Minecraft logs](docs/retrieve_latest_log.md).
+- If something crashes or stops chopping, send a log! See [how to find and share Minecraft logs](https://github.com/MagicJinn/ht-treechop-recontinued/blob/main/docs/retrieve_latest_log.md).
 
 ## FAQ
 
