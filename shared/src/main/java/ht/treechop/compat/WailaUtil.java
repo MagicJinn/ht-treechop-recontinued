@@ -12,7 +12,9 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -76,24 +78,35 @@ public class WailaUtil {
 
             if (tree.isAProperTree(Client.getChopSettings().getTreesMustHaveLeaves())) {
                 if (showNumChops) {
-                    addNumChops.accept(Component.translatable("treechop.waila.x_out_of_y_chops", tree.getChops(), ChopUtil.numChopsToFell(level, tree.streamLogs())));
+                    addNumChops.accept(Component.translatable(
+                            "treechop.waila.x_out_of_y_chops",
+                            tree.getChops(),
+                            ChopUtil.numChopsToFell(level, tree.streamLogs())));
                 }
 
                 if (showTreeBlocks) {
                     tree.streamLogs()
-                            .collect(Collectors.groupingBy((BlockPos pos2) -> {
-                                BlockState state = level.getBlockState(pos2);
-                                return state.getCloneItemStack(level, pos2, true).getItem();
-                            }, Collectors.counting()))
+                            .collect(Collectors.groupingBy(
+                                    pos2 -> cloneLogItem(level, pos2),
+                                    Collectors.counting()))
                             .forEach((item, count) -> {
-                                ItemStack stack = item.getDefaultInstance();
-                                stack.setCount(count.intValue());
-                                addTreeBlockStack.accept(stack);
+                                if (item != Items.AIR) {
+                                    ItemStack stack = item.getDefaultInstance();
+                                    stack.setCount(count.intValue());
+                                    addTreeBlockStack.accept(stack);
+                                }
                             });
                 }
             }
         } catch (Exception e) {
             throw new TreeChopException(String.format("Parameters: %s, %s, %s, %s", level, pos, showTreeBlocks, showNumChops), e);
         }
+    }
+
+    /** Prefer original wood. Avoid includeData (chopped BE is not a wood BE). */
+    private static Item cloneLogItem(Level level, BlockPos pos) {
+        BlockState state = getLogState(level, pos, level.getBlockState(pos));
+        ItemStack stack = state.getCloneItemStack(level, pos, false);
+        return stack.isEmpty() ? Items.AIR : stack.getItem();
     }
 }

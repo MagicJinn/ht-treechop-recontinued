@@ -89,6 +89,7 @@ public abstract class Client {
         Level level = Minecraft.getInstance().level;
         if (level != null && level.getBlockEntity(pos) instanceof ChoppedLogBlock.MyEntity entity)
             entity.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), tag));
+        treeCache.invalidate();
     }
 
     public static Player getPlayer() {

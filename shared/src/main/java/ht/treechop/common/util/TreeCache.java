@@ -39,11 +39,18 @@ public class TreeCache {
         private int numChops;
 
         public T get(BlockGetter level, BlockPos pos) {
-            if (level == this.level && pos.equals(this.pos) && Objects.equals(level.getBlockState(pos), blockState) && Objects.equals(level.getBlockEntity(pos), entity) && (entity instanceof ChoppedLogBlock.MyEntity choppedEntity && choppedEntity.getChops() == numChops)) {
-                return value;
-            } else {
+            if (level != this.level
+                    || !pos.equals(this.pos)
+                    || !Objects.equals(level.getBlockState(pos), blockState)
+                    || !Objects.equals(level.getBlockEntity(pos), entity))
                 return null;
-            }
+
+            // Invalidate when chop count changes on a chopped log.
+            if (entity instanceof ChoppedLogBlock.MyEntity choppedEntity
+                    && choppedEntity.getChops() != numChops)
+                return null;
+
+            return value;
         }
 
         public void put(BlockGetter level, BlockPos pos, T value) {

@@ -40,7 +40,8 @@ public class PolymerFabricChoppedLogBlock extends FabricChoppedLogBlock
 
     @Override
     public boolean canSyncRawToClient(PacketContext context) {
-        return TreeChopPolymerClients.hasMod(PolymerCommonUtils.getPlayer(context));
+        ServerPlayer player = PolymerCommonUtils.getPlayer(context);
+        return player == null || TreeChopPolymerClients.hasMod(player);
     }
 
     /**

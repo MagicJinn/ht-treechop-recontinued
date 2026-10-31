@@ -2,6 +2,7 @@ package ht.treechop.compat.polymer;
 
 import eu.pb4.polymer.blocks.api.BlockModelType;
 import eu.pb4.polymer.blocks.api.PolymerBlockResourceUtils;
+import eu.pb4.polymer.common.api.PolymerCommonUtils;
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import eu.pb4.polymer.core.api.utils.PolymerSyncedObject;
 import eu.pb4.polymer.rsm.api.RegistrySyncUtils;
@@ -73,8 +74,10 @@ public final class TreeChopPolymer {
 
             @Override
             public boolean canSyncRawToClient(PacketContext context) {
-                return TreeChopPolymerClients.hasMod(
-                        eu.pb4.polymer.common.api.PolymerCommonUtils.getPlayer(context));
+                // Match block-state fail-open. Null player keeps the real BE. Otherwise
+                // chopped_log can sync without its entity and Jade loses chops/wood data.
+                ServerPlayer player = PolymerCommonUtils.getPlayer(context);
+                return player == null || TreeChopPolymerClients.hasMod(player);
             }
         });
 
